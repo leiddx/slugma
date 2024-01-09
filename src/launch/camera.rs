@@ -1,14 +1,7 @@
-use bevy;
-use bevy::prelude::Camera;
-use bevy::prelude::Camera3dBundle;
-use bevy::prelude::Commands;
-use bevy::prelude::Quat;
-use bevy::prelude::Query;
-use bevy::prelude::Res;
-use bevy::prelude::Transform;
-use bevy::prelude::Vec3;
-use bevy::prelude::With;
-use bevy::time::Time;
+use bevy::{
+	prelude::{Camera, Camera3dBundle, Commands, Quat, Query, Res, Transform, Vec3, With},
+	time::Time,
+};
 
 pub fn setup(mut commands: Commands) {
 	commands.spawn(
@@ -20,7 +13,7 @@ pub fn setup(mut commands: Commands) {
 				Vec3::ZERO,
 				Vec3::Y,
 			),
-			..bevy::prelude::default()
+			..Default::default()
 		},
 	);
 }

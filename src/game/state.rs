@@ -1,7 +1,8 @@
 use bevy::prelude::States;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash, Default, States)]
-pub enum GameState {
+pub enum ConsoleState {
 	#[default]
-	Launch,
+	Close,
+	Open,
 }

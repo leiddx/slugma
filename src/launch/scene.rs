@@ -1,16 +1,7 @@
-use bevy;
-use bevy::prelude::shape;
-use bevy::prelude::Assets;
-use bevy::prelude::Color;
-use bevy::prelude::Commands;
-use bevy::prelude::GizmoConfig;
-use bevy::prelude::Gizmos;
-use bevy::prelude::Mesh;
-use bevy::prelude::PbrBundle;
-use bevy::prelude::Quat;
-use bevy::prelude::ResMut;
-use bevy::prelude::StandardMaterial;
-use bevy::prelude::Vec3;
+use bevy::prelude::{
+	shape, Assets, Color, Commands, GizmoConfig, Gizmos, Mesh, PbrBundle, Quat, ResMut,
+	StandardMaterial, Vec3,
+};
 
 pub fn setup_plane(
 	mut commands: Commands,
@@ -26,7 +17,7 @@ pub fn setup_plane(
 				)
 				.into(),
 			),
-			..bevy::prelude::default()
+			..Default::default()
 		},
 	);
 }

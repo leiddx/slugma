@@ -1,8 +1,8 @@
-use bevy::prelude::App;
-use bevy::DefaultPlugins;
-
 mod game;
 mod launch;
+mod state;
+
+use bevy::{app::App, DefaultPlugins};
 
 fn main() {
 	let mut app = App::new();
