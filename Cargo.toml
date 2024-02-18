@@ -9,10 +9,11 @@ edition = "2021"
 opt-level = 3
 
 [workspace]
-members = ["client", "launch"]
+members = ["client", "launch", "menu"]
 
 [dependencies]
 bevy = "0.12"
 
 client = { path = "client" }
 launch = { path = "launch" }
+menu = { path = "menu" }
