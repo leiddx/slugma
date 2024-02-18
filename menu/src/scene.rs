@@ -3,6 +3,7 @@ use bevy::{
 	ecs::{
 		component::Component,
 		entity::Entity,
+		event::EventWriter,
 		query::With,
 		system::{Commands, Query, ResMut},
 	},
@@ -13,6 +14,7 @@ use bevy::{
 		mesh::{shape::Plane, Mesh},
 	},
 };
+use client::{Feedback, RecordLevel};
 
 #[derive(Component)]
 pub(crate) struct Mark;
@@ -48,4 +50,14 @@ pub fn cleanup(mut commands: Commands, mark: Query<Entity, With<Mark>>) {
 			.entity(id)
 			.despawn_recursive();
 	}
+}
+
+
+pub fn display(mut feedback: EventWriter<Feedback>) {
+	feedback.send(
+		Feedback::Append(
+			String::from("大风云起"),
+			RecordLevel::Display,
+		),
+	);
 }

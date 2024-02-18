@@ -4,7 +4,7 @@ mod music;
 mod scene;
 
 use bevy::{
-	app::{App, Plugin, Update},
+	app::{App, FixedUpdate, Plugin, Update},
 	ecs::schedule::{common_conditions, IntoSystemConfigs, OnEnter},
 	time::{Fixed, Time},
 };
@@ -44,6 +44,11 @@ impl Plugin for Plugins {
 				music::option.run_if(common_conditions::state_changed::<Music>()),
 			)
 				.run_if(common_conditions::in_state(GameChapter::Menu)),
+		);
+
+		app.add_systems(
+			FixedUpdate,
+			scene::display,
 		);
 	}
 }

@@ -70,7 +70,7 @@ impl Record {
 		for _ in 0..quantity {
 			self.push(
 				"",
-				RecordLevel::Info,
+				RecordLevel::Display,
 			);
 		}
 	}
@@ -497,6 +497,7 @@ pub fn execute(
 					&help[..],
 					RecordLevel::Success,
 				);
+				actuator.push_empty_record(1);
 
 				continue;
 			}
@@ -510,6 +511,7 @@ pub fn execute(
 						&help[..],
 						RecordLevel::Success,
 					);
+					actuator.push_empty_record(1);
 
 					continue;
 				},

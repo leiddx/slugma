@@ -64,47 +64,29 @@ impl Panel {
 	}
 
 	pub fn limit_display(&mut self, height: &f32) {
-		let height = height - 42.0;
+		let display = (height - 30.0 - self.style.font_size) / self.style.font_size;
 
-		let max_display = height / self.style.font_size;
+		let max_display = display as usize;
 
-		self.max_display = max_display as usize;
-		self.scroll_step = (max_display / 10.0).ceil() as usize;
+		self.max_display = max_display;
+		self.scroll_step = max_display / 10;
 	}
 
-	pub fn parse(
-		&self,
-		text: &str,
-		level: &RecordLevel,
-	) -> (
-		String,
-		Color,
-	) {
-		let text = format!(
-			"  {}",
-			text
-		);
-
-		let color = match level {
+	pub fn dyeing(&self, level: &RecordLevel) -> Color {
+		match level {
 			| RecordLevel::Info => Color::WHITE,
 			| RecordLevel::Success => Color::GREEN,
 			| RecordLevel::Error => Color::RED,
 			| RecordLevel::Warn => Color::ORANGE,
 			| RecordLevel::Display => Color::GRAY,
-		};
-
-		(
-			text, color,
-		)
+		}
 	}
 
-	pub fn format(&self, text: &str, level: &RecordLevel) -> TextBundle {
-		let (text, color) = self.parse(
-			text, level,
-		);
+	pub fn from_section(&self) -> TextBundle {
+		let color = self.dyeing(&RecordLevel::Display);
 
 		TextBundle::from_section(
-			text,
+			"",
 			TextStyle {
 				color,
 				..self.style.clone()
@@ -122,8 +104,8 @@ pub fn setup(
 ) {
 	let window = window.single_mut();
 
-	let style = TextStyle {
-		font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+	let text_style = TextStyle {
+		font: asset_server.load("fonts/SourceHanSansCN-Regular.otf"),
 		font_size: 14.0,
 
 		..Default::default()
@@ -132,20 +114,23 @@ pub fn setup(
 
 	let panel = Panel::new(
 		&window.height(),
-		style.clone(),
+		text_style.clone(),
 	);
 
 	let mut label: Vec<Entity> = Vec::new();
 
 	for _ in 0..panel.max_display {
+		let mut label_text = panel.from_section();
+
+		label_text
+			.style
+			.min_height = Val::Px(10.0);
+		label_text.style.margin = UiRect::left(Val::Px(10.0));
+
 		let id = commands
 			.spawn(
 				(
-					Label,
-					panel.format(
-						"",
-						&RecordLevel::Display,
-					),
+					Label, label_text,
 				),
 			)
 			.id();
@@ -165,7 +150,6 @@ pub fn setup(
 						width: Val::Vw(100.0),
 						height: Val::Vh(100.0),
 						padding: UiRect::all(Val::Px(10.0)),
-						border: UiRect::all(Val::Px(10.0)),
 						overflow: Overflow::clip(),
 
 						..Default::default()
@@ -204,8 +188,8 @@ pub fn setup(
 					(
 						Prompt,
 						TextBundle::from_section(
-							"> _",
-							style.clone(),
+							"$ _",
+							text_style.clone(),
 						),
 					),
 				);
@@ -439,7 +423,7 @@ pub fn panel_refresh(
 		)
 		.collect();
 
-	let padding = panel
+	let start = panel
 		.max_display
 		.saturating_sub(item.len());
 
@@ -447,14 +431,14 @@ pub fn panel_refresh(
 		.iter_mut()
 		.enumerate()
 	{
-		let (text, level) = if i < padding {
+		let (text, level) = if i < start {
 			(
 				String::from(""),
 				RecordLevel::Display,
 			)
 		}
 		else {
-			let (text, level) = item[i.saturating_sub(padding)];
+			let (text, level) = item[i.saturating_sub(start)];
 
 			(
 				text.clone(),
@@ -462,9 +446,7 @@ pub fn panel_refresh(
 			)
 		};
 
-		let (text, color) = panel.parse(
-			&text, &level,
-		);
+		let color = panel.dyeing(&level);
 
 		v.sections[0].value = text;
 		v.sections[0]
@@ -482,7 +464,7 @@ pub fn prompt_refresh(
 
 	for v in prompt_refresh.read() {
 		text.sections[0].value = format!(
-			"> {}_",
+			"$ {}_",
 			v.0.to_string()
 		);
 	}
