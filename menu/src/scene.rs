@@ -8,10 +8,11 @@ use bevy::{
 		system::{Commands, Query, ResMut},
 	},
 	hierarchy::DespawnRecursiveExt,
+	math::primitives::Plane3d,
 	pbr::{PbrBundle, StandardMaterial},
 	render::{
 		color::Color,
-		mesh::{shape::Plane, Mesh},
+		mesh::{Mesh, Meshable},
 	},
 };
 use client::{Feedback, RecordLevel};
@@ -29,13 +30,18 @@ pub fn setup(
 		(
 			Mark,
 			PbrBundle {
-				mesh: meshes.add(Mesh::from(Plane::from_size(4.0))),
+				mesh: meshes.add(
+					Plane3d::default()
+						.mesh()
+						.size(
+							5.0, 5.0,
+						),
+				),
 
 				material: materials.add(
 					Color::rgb(
 						0.3, 0.5, 0.3,
-					)
-					.into(),
+					),
 				),
 
 				..Default::default()

@@ -42,7 +42,9 @@ pub struct Plugins;
 
 impl Plugin for Plugins {
 	fn build(&self, app: &mut App) {
-		app.add_state::<Console>();
+		app.init_state::<Console>();
+
+		app.init_resource::<Actuator>();
 
 		app.add_event::<PanelRefresh>();
 		app.add_event::<PromptRefresh>();
@@ -52,7 +54,6 @@ impl Plugin for Plugins {
 		app.add_event::<Execute>();
 		app.add_event::<Feedback>();
 
-		app.init_resource::<Actuator>();
 
 		app.configure_sets(
 			Update,
@@ -98,11 +99,9 @@ impl Plugin for Plugins {
 
 		app.add_systems(
 			Update,
-			(
-				console::open
-					.run_if(common_conditions::on_event::<KeyboardInput>())
-					.run_if(common_conditions::in_state(Console::Close)),
-			),
+			console::open
+				.run_if(common_conditions::on_event::<KeyboardInput>())
+				.run_if(common_conditions::in_state(Console::Close)),
 		);
 
 		app.add_systems(
@@ -111,8 +110,9 @@ impl Plugin for Plugins {
 				.pipe(console::received_character)
 				.before(command::execute)
 				.run_if(
-					common_conditions::on_event::<ReceivedCharacter>()
-						.or_else(common_conditions::on_event::<UpdateCharacter>()),
+					common_conditions::on_event::<KeyboardInput>()
+						.or_else(common_conditions::on_event::<UpdateCharacter>())
+						.or_else(common_conditions::on_event::<ReceivedCharacter>()),
 				)
 				.in_set(Step::Receive),
 		);

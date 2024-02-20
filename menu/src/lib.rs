@@ -1,4 +1,6 @@
 mod camera;
+mod event;
+mod input;
 mod light;
 mod music;
 mod scene;
@@ -6,9 +8,10 @@ mod scene;
 use bevy::{
 	app::{App, FixedUpdate, Plugin, Update},
 	ecs::schedule::{common_conditions, IntoSystemConfigs, OnEnter},
+	input::{gamepad::GamepadButtonInput, keyboard::KeyboardInput},
 	time::{Fixed, Time},
 };
-use launch::state::{GameChapter, Music};
+use launch::state::{GameChapter, GameInput, Music};
 
 
 pub struct Plugins;
@@ -41,7 +44,13 @@ impl Plugin for Plugins {
 			Update,
 			(
 				camera::rotate,
-				music::option.run_if(common_conditions::state_changed::<Music>()),
+				input::keyboard
+					.run_if(common_conditions::in_state(GameInput::Keyboard))
+					.run_if(common_conditions::on_event::<KeyboardInput>()),
+				input::gamepad
+					.run_if(common_conditions::in_state(GameInput::Gamepad))
+					.run_if(common_conditions::on_event::<GamepadButtonInput>()),
+				music::option.run_if(common_conditions::state_changed::<Music>),
 			)
 				.run_if(common_conditions::in_state(GameChapter::Menu)),
 		);

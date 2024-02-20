@@ -3,7 +3,10 @@ use bevy::{
 		event::{EventReader, EventWriter},
 		system::{Local, ResMut},
 	},
-	input::{keyboard::KeyCode, Input},
+	input::{
+		keyboard::{Key, KeyCode, KeyboardInput},
+		ButtonInput, ButtonState,
+	},
 	window::ReceivedCharacter,
 };
 
@@ -31,50 +34,62 @@ pub fn received(
 	mut character: Local<String>,
 	mut update_character: EventReader<UpdateCharacter>,
 	mut received_character: EventReader<ReceivedCharacter>,
-	mut key_code: ResMut<Input<KeyCode>>,
+	mut key_code: ResMut<ButtonInput<KeyCode>>,
+	mut keyboard_input: EventReader<KeyboardInput>,
 ) -> (
 	String,
 	bool,
 ) {
-	for v in received_character.read() {
-		if v.char.is_control() {
-			continue;
-		}
+	let mut enter = false;
 
-		character.push(v.char);
+	for v in received_character.read() {
+		if let Some(char) = v.char.chars().nth(0) {
+			if char.is_control() {
+				continue;
+			}
+
+			character.push(char);
+		}
 	}
 
 	for v in update_character.read() {
 		*character = v.0.to_string();
 	}
 
-	if key_code.any_just_pressed([KeyCode::Return, KeyCode::NumpadEnter]) {
-		let v = (
-			character.to_string(),
-			true,
-		);
+	for v in keyboard_input.read() {
+		if v.state == ButtonState::Released {
+			continue;
+		}
 
-		character.clear();
-		key_code.clear();
+		match v.logical_key {
+			| Key::Escape => {
+				if !character.is_empty() {
+					key_code.clear();
 
-		return v;
+					character.clear();
+				}
+			},
+
+			| Key::Backspace | Key::Delete => {
+				character.pop();
+			},
+
+			| Key::Enter => {
+				enter = true;
+			},
+
+			| _ => {},
+		}
 	}
 
-
-	if key_code.any_just_pressed([KeyCode::Back, KeyCode::Delete]) {
-		character.pop();
-
-		key_code.clear();
-	}
-
-	if key_code.just_pressed(KeyCode::Escape) && !character.is_empty() {
-		character.clear();
-
-		key_code.clear();
-	}
-
-	(
+	let value = (
 		character.to_string(),
-		false,
-	)
+		enter,
+	);
+
+	if enter {
+		character.clear();
+	}
+
+	value
 }

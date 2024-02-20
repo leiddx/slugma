@@ -28,12 +28,12 @@ impl Plugin for Plugins {
 		app.add_plugins(FrameTimeDiagnosticsPlugin::default());
 
 
-		app.add_state::<Fps>();
-		app.add_state::<Ruler>();
-		app.add_state::<Music>();
+		app.init_state::<Fps>();
+		app.init_state::<Ruler>();
+		app.init_state::<Music>();
 
-		app.add_state::<GameInput>();
-		app.add_state::<GameChapter>();
+		app.init_state::<GameInput>();
+		app.init_state::<GameChapter>();
 
 
 		app.add_command_event(

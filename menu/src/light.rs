@@ -18,9 +18,6 @@ pub fn setup(mut commands: Commands) {
 		(
 			Mark,
 			PointLightBundle {
-				transform: Transform::from_xyz(
-					0.0, 4.8, 0.0,
-				),
 				point_light: PointLight {
 					intensity: 3000.0,
 					shadows_enabled: true,
@@ -28,6 +25,10 @@ pub fn setup(mut commands: Commands) {
 
 					..Default::default()
 				},
+
+				transform: Transform::from_xyz(
+					0.0, 4.8, 0.0,
+				),
 
 				..Default::default()
 			},

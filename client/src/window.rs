@@ -3,7 +3,7 @@ use bevy::{
 		event::EventReader,
 		system::{Query, ResMut},
 	},
-	input::{keyboard::KeyCode, Input},
+	input::{keyboard::KeyCode, ButtonInput},
 	window::{CursorGrabMode, EnabledButtons, Window, WindowFocused, WindowLevel, WindowMode},
 };
 
@@ -50,11 +50,11 @@ pub fn focus(mut window: Query<&mut Window>, mut window_focused: EventReader<Win
 	}
 }
 
-pub fn change_mode(mut key_code: ResMut<Input<KeyCode>>, mut window: Query<&mut Window>) {
+pub fn change_mode(mut key_code: ResMut<ButtonInput<KeyCode>>, mut window: Query<&mut Window>) {
 	let mut window = window.single_mut();
 
 	let alt = key_code.any_pressed([KeyCode::AltLeft, KeyCode::AltRight]);
-	let enter = key_code.any_just_pressed([KeyCode::Return, KeyCode::NumpadEnter]);
+	let enter = key_code.any_just_pressed([KeyCode::Enter, KeyCode::NumpadEnter]);
 
 	if alt && enter {
 		window.mode = match window.mode {

@@ -12,7 +12,7 @@ use bevy::{
 	input::{
 		keyboard::KeyCode,
 		mouse::{MouseScrollUnit, MouseWheel},
-		Input,
+		ButtonInput,
 	},
 	render::color::Color,
 	text::{Text, TextStyle},
@@ -106,7 +106,7 @@ pub fn setup(
 
 	let text_style = TextStyle {
 		font: asset_server.load("fonts/SourceHanSansCN-Regular.otf"),
-		font_size: 14.0,
+		font_size: 16.0,
 
 		..Default::default()
 	};
@@ -215,8 +215,8 @@ pub fn cleanup(mut commands: Commands, panel: Query<Entity, With<Panel>>) {
 	}
 }
 
-pub fn open(mut key_code: ResMut<Input<KeyCode>>, mut console: ResMut<NextState<Console>>) {
-	if key_code.just_pressed(KeyCode::Grave) {
+pub fn open(mut key_code: ResMut<ButtonInput<KeyCode>>, mut console: ResMut<NextState<Console>>) {
+	if key_code.just_pressed(KeyCode::Backquote) {
 		console.set(Console::Open);
 
 		key_code.clear();
@@ -224,11 +224,11 @@ pub fn open(mut key_code: ResMut<Input<KeyCode>>, mut console: ResMut<NextState<
 }
 
 pub fn close(
-	mut key_code: ResMut<Input<KeyCode>>,
+	mut key_code: ResMut<ButtonInput<KeyCode>>,
 	mut console: ResMut<NextState<Console>>,
 	mut prompt_refresh: EventWriter<PromptRefresh>,
 ) {
-	if key_code.any_just_pressed([KeyCode::Grave, KeyCode::Escape]) {
+	if key_code.any_just_pressed([KeyCode::Backquote, KeyCode::Escape]) {
 		console.set(Console::Close);
 
 		key_code.clear();
@@ -261,11 +261,11 @@ pub fn received_character(
 
 pub fn history_roll_back(
 	mut actuator: ResMut<Actuator>,
-	mut key_code: ResMut<Input<KeyCode>>,
+	mut key_code: ResMut<ButtonInput<KeyCode>>,
 	mut prompt_refresh: EventWriter<PromptRefresh>,
 	mut update_character: EventWriter<UpdateCharacter>,
 ) {
-	if key_code.just_pressed(KeyCode::Up) {
+	if key_code.just_pressed(KeyCode::ArrowUp) {
 		key_code.clear();
 
 		if let Some(message) = actuator.roll_back_history() {
@@ -277,11 +277,11 @@ pub fn history_roll_back(
 
 pub fn history_roll_forward(
 	mut actuator: ResMut<Actuator>,
-	mut key_code: ResMut<Input<KeyCode>>,
+	mut key_code: ResMut<ButtonInput<KeyCode>>,
 	mut prompt_refresh: EventWriter<PromptRefresh>,
 	mut update_character: EventWriter<UpdateCharacter>,
 ) {
-	if key_code.just_pressed(KeyCode::Down) {
+	if key_code.just_pressed(KeyCode::ArrowDown) {
 		let message = if let Some(message) = actuator.roll_forward_history() {
 			message.clone()
 		}
@@ -299,7 +299,7 @@ pub fn history_roll_forward(
 
 pub fn panel_scroll_up(
 	actuator: Res<Actuator>,
-	mut key_code: ResMut<Input<KeyCode>>,
+	mut key_code: ResMut<ButtonInput<KeyCode>>,
 	mut panel: Query<&mut Panel>,
 	mut panel_refresh: EventWriter<PanelRefresh>,
 ) {
@@ -320,7 +320,7 @@ pub fn panel_scroll_up(
 
 
 pub fn panel_scroll_down(
-	mut key_code: ResMut<Input<KeyCode>>,
+	mut key_code: ResMut<ButtonInput<KeyCode>>,
 	mut panel: Query<&mut Panel>,
 	mut panel_refresh: EventWriter<PanelRefresh>,
 ) {

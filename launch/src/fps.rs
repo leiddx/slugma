@@ -133,7 +133,7 @@ pub fn update(diagnostics: Res<DiagnosticsStore>, mut fps_text: Query<&mut Text,
 	let mut text = fps_text.single_mut();
 
 	let (fps, color) = if let Some(value) = diagnostics
-		.get(FrameTimeDiagnosticsPlugin::FPS)
+		.get(&FrameTimeDiagnosticsPlugin::FPS)
 		.and_then(|fps| fps.smoothed())
 	{
 		let color = if value < 30.0 {

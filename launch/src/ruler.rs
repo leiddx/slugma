@@ -4,7 +4,7 @@ use bevy::{
 		schedule::{NextState, State},
 		system::{Res, ResMut},
 	},
-	gizmos::{gizmos::Gizmos, GizmoConfig},
+	gizmos::gizmos::Gizmos,
 	math::Vec3,
 	render::color::Color,
 };
@@ -78,7 +78,7 @@ pub fn display(
 	}
 }
 
-pub fn update(mut gizmos: Gizmos, mut gizmo_config: ResMut<GizmoConfig>) {
+pub fn update(mut gizmos: Gizmos) {
 	let a = -5_000.0;
 	let b = 10_000.0;
 
@@ -111,6 +111,4 @@ pub fn update(mut gizmos: Gizmos, mut gizmo_config: ResMut<GizmoConfig>) {
 		),
 		Color::GREEN,
 	);
-
-	gizmo_config.line_perspective = true;
 }
