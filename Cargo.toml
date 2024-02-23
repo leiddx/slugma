@@ -13,6 +13,8 @@ members = ["client", "launch", "menu"]
 
 [dependencies]
 bevy = "0.13"
+bevy-inspector-egui = "0.21"
+
 
 client = { path = "client" }
 launch = { path = "launch" }

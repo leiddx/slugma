@@ -1,11 +1,29 @@
 # slugma
 
-`paper map`: 
+`Paper Map`: 
  - Politics
- - cultural characteristics
- - economy
- - military strength
- - altitude
- - ecological landforms
- - biomes
- - etc.
+ - Cultural Characteristics
+ - Economy
+ - Military Strength
+ - Altitude
+ - Ecological Landforms
+ - Biomes
+ - ETC.
+
+
+`player`
+ - Forward
+ - Retreat
+ - ForwardAssault
+ - RetreatAssault
+ - Stand
+ - Squat
+ - Crawling
+ - Block
+ - Tumble
+ - Jump
+ - Break
+ - Launch
+ - Active
+ - Recovery
+ - Stun
