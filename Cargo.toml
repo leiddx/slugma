@@ -8,5 +8,10 @@ edition = "2021"
 [profile.dev.package."*"]
 opt-level = 1
 
+[workspace]
+members = ["client"]
+
 [dependencies]
 bevy = "0.13"
+
+client = { path = "client" }
