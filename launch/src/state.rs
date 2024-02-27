@@ -16,6 +16,13 @@ pub enum Ruler {
 }
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash, Default, States)]
+pub enum Audio {
+	#[default]
+	Close,
+	Open(i8),
+}
+
+#[derive(Clone, Eq, PartialEq, Debug, Hash, Default, States)]
 pub enum Music {
 	#[default]
 	Stop,

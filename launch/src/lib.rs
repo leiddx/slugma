@@ -1,3 +1,4 @@
+pub mod audio;
 pub mod event;
 pub mod fps;
 pub mod input;
@@ -14,11 +15,11 @@ use bevy::{
 	},
 };
 use client::AddCommandEvent;
-use event::RulerCommand;
+use event::{AudioCommand, RulerCommand};
 
 use crate::{
 	event::{FpsCommand, InputCommand, MusicCommand},
-	state::{Fps, GameChapter, GameInput, Music, Ruler},
+	state::{Audio, Fps, GameChapter, GameInput, Music, Ruler},
 };
 
 pub struct Plugins;
@@ -31,6 +32,7 @@ impl Plugin for Plugins {
 		app.init_state::<Fps>();
 		app.init_state::<Ruler>();
 		app.init_state::<Music>();
+		app.init_state::<Audio>();
 
 		app.init_state::<GameInput>();
 		app.init_state::<GameChapter>();
@@ -54,6 +56,11 @@ impl Plugin for Plugins {
 		app.add_command_event(
 			music::new(),
 			music::parse,
+		);
+
+		app.add_command_event(
+			audio::new(),
+			audio::parse,
 		);
 
 
@@ -80,6 +87,7 @@ impl Plugin for Plugins {
 				ruler::update.run_if(common_conditions::in_state(Ruler::On)),
 				input::toggle.run_if(common_conditions::on_event::<InputCommand>()),
 				music::option.run_if(common_conditions::on_event::<MusicCommand>()),
+				audio::option.run_if(common_conditions::on_event::<AudioCommand>()),
 			),
 		);
 	}

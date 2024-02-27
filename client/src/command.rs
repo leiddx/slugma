@@ -9,6 +9,7 @@ use bevy::{
 		event::{Event, EventReader, EventWriter},
 		system::{Commands, ResMut, Resource, SystemId},
 	},
+	log::info,
 };
 use clap::ArgMatches;
 use shlex::Shlex;
@@ -326,19 +327,21 @@ impl Actuator {
 	)> {
 		let matcher = self.matcher.clone();
 
-		let mut arguments: Vec<String> = Vec::new();
+		let mut arguments = shlex::split(input);
 
-		arguments.push(
-			matcher
-				.get_name()
-				.to_string(),
+
+
+		info!(
+			"{:?}",
+			arguments
 		);
 
-		for v in Shlex::new(input).collect::<Vec<_>>() {
-			arguments.push(v);
-		}
-
 		if let Ok(matcher) = matcher.try_get_matches_from(arguments) {
+			info!(
+				"{:?}",
+				matcher
+			);
+
 			if let Some((bin, args)) = matcher.subcommand() {
 				return Some(
 					(
@@ -380,7 +383,8 @@ impl Default for Actuator {
 	fn default() -> Self {
 		let record = Record::new(500);
 
-		let matcher = clap::Command::new("")
+		let matcher = clap::Command::new("command")
+			.multicall(true)
 			.disable_help_flag(true)
 			.disable_help_subcommand(true)
 			.subcommand(clap::Command::new("help").about("show the commands"))

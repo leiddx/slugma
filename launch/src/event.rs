@@ -20,6 +20,13 @@ pub enum RulerCommand {
 
 
 #[derive(Event, Default)]
+pub enum AudioCommand {
+	#[default]
+	State,
+	Volume(i8),
+}
+
+#[derive(Event, Default)]
 pub enum MusicCommand {
 	#[default]
 	State,
