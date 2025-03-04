@@ -1,6 +1,6 @@
 use bevy::{
-	input::ButtonInput,
-	prelude::{EventWriter, KeyCode, ResMut},
+	ecs::{event::EventWriter, system::ResMut},
+	input::{keyboard::KeyCode, ButtonInput},
 };
 
 use super::event::PromptRefresh;

@@ -6,11 +6,13 @@ use bevy::{
 	app::{App, Update},
 	ecs::{
 		event::{EventReader, EventWriter},
-		schedule::common_conditions,
+		schedule::{common_conditions, IntoSystemConfigs as _},
 		system::{Res, ResMut},
 	},
-	prelude::{AppExtStates, IntoSystemConfigs},
-	state::state::{NextState, State},
+	state::{
+		app::AppExtStates as _,
+		state::{NextState, State},
+	},
 };
 
 use crate::core::{event::Feedback, AddCommandEvent, Level};
@@ -91,7 +93,7 @@ impl bevy::app::Plugin for Plugin {
 
 		app.add_systems(
 			Update,
-			(toggle.run_if(common_conditions::on_event::<event::Input>()),),
+			(toggle.run_if(common_conditions::on_event::<event::Input>),),
 		);
 	}
 }

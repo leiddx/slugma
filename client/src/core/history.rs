@@ -1,4 +1,4 @@
-use bevy::prelude::Resource;
+use bevy::ecs::system::Resource;
 
 #[derive(Resource, Default, Debug)]
 pub struct History {

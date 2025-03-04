@@ -1,6 +1,6 @@
 use bevy::{
-	prelude::{Component, EventReader, Query, With},
-	text::Text,
+	ecs::{component::Component, event::EventReader, query::With, system::Query},
+	ui::widget::Text,
 };
 
 use super::event::PromptRefresh;
@@ -17,7 +17,7 @@ pub fn refresh(
 	let mut text = prompt.single_mut();
 
 	for v in prompt_refresh.read() {
-		text.sections[0].value = format!(
+		**text = format!(
 			"$ {}_",
 			v.0.to_string()
 		);

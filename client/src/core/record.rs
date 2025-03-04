@@ -1,6 +1,6 @@
 use std::collections::{vec_deque::Iter, VecDeque};
 
-use bevy::prelude::Resource;
+use bevy::ecs::system::Resource;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash, Default)]
 pub enum Level {

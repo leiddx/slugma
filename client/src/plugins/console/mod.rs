@@ -8,13 +8,19 @@ pub mod state;
 
 use bevy::{
 	app::{App, Update},
-	ecs::schedule::common_conditions,
-	input::{keyboard::KeyboardInput, mouse::MouseWheel},
-	prelude::{
-		AppExtStates, Condition, IntoSystem, IntoSystemConfigs, IntoSystemSetConfigs, OnEnter,
-		OnExit, SystemSet,
+	ecs::{
+		schedule::{
+			common_conditions, Condition as _, IntoSystemConfigs as _, IntoSystemSetConfigs as _,
+			SystemSet,
+		},
+		system::IntoSystem as _,
 	},
-	state::condition,
+	input::{keyboard::KeyboardInput, mouse::MouseWheel},
+	state::{
+		app::AppExtStates as _,
+		condition,
+		state::{OnEnter, OnExit},
+	},
 	window::WindowResized,
 };
 use event::{PanelRefresh, PromptRefresh};
@@ -78,7 +84,7 @@ impl bevy::app::Plugin for Plugin {
 		app.add_systems(
 			Update,
 			ui::open
-				.run_if(common_conditions::on_event::<KeyboardInput>())
+				.run_if(common_conditions::on_event::<KeyboardInput>)
 				.run_if(condition::in_state(Console::Close)),
 		);
 
@@ -88,8 +94,8 @@ impl bevy::app::Plugin for Plugin {
 				.pipe(ui::received_character)
 				.before(core::execute)
 				.run_if(
-					common_conditions::on_event::<KeyboardInput>()
-						.or_else(common_conditions::on_event::<character::event::Update>()),
+					common_conditions::on_event::<KeyboardInput>
+						.or(common_conditions::on_event::<character::event::Update>),
 				)
 				.in_set(Step::Receive),
 		);
@@ -104,9 +110,9 @@ impl bevy::app::Plugin for Plugin {
 					panel::scroll_up,
 					panel::scroll_down,
 				)
-					.run_if(common_conditions::on_event::<KeyboardInput>()),
-				panel::scroll_wheel.run_if(common_conditions::on_event::<MouseWheel>()),
-				panel::resize.run_if(common_conditions::on_event::<WindowResized>()),
+					.run_if(common_conditions::on_event::<KeyboardInput>),
+				panel::scroll_wheel.run_if(common_conditions::on_event::<MouseWheel>),
+				panel::resize.run_if(common_conditions::on_event::<WindowResized>),
 			)
 				.in_set(Step::Update),
 		);
@@ -116,11 +122,11 @@ impl bevy::app::Plugin for Plugin {
 			(
 				panel::refresh_transfer
 					.after(core::execute)
-					.run_if(common_conditions::on_event::<Refresh>()),
+					.run_if(common_conditions::on_event::<Refresh>),
 				panel::refresh
 					.after(panel::refresh_transfer)
-					.run_if(common_conditions::on_event::<PanelRefresh>()),
-				prompt::refresh.run_if(common_conditions::on_event::<PromptRefresh>()),
+					.run_if(common_conditions::on_event::<PanelRefresh>),
+				prompt::refresh.run_if(common_conditions::on_event::<PromptRefresh>),
 			)
 				.in_set(Step::Refresh),
 		);

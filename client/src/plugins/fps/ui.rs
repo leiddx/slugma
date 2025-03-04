@@ -10,8 +10,8 @@ use bevy::{
 	},
 	hierarchy::DespawnRecursiveExt,
 	state::state::{NextState, State},
-	text::{Text, TextStyle},
-	ui::{node_bundles::TextBundle, PositionType, Style, Val, ZIndex},
+	text::{TextColor, TextFont},
+	ui::{widget::Text, GlobalZIndex, Node, PositionType, Val},
 };
 use clap;
 
@@ -41,32 +41,26 @@ pub fn parse(arg: clap::ArgMatches) -> Option<event::Fps> {
 }
 
 pub fn setup(mut commands: Commands) {
-	let style = Style {
-		position_type: PositionType::Absolute,
-		right: Val::Px(12.0),
-		top: Val::Px(8.0),
-		bottom: Val::Auto,
-		left: Val::Auto,
-
-		..Default::default()
-	};
-
-	let mut text = TextBundle::from_section(
-		"N/A",
-		TextStyle {
-			font_size: 16.0,
-			color: Color::WHITE,
-
-			..Default::default()
-		},
-	);
-
-	text.z_index = ZIndex::Global(i32::MAX);
-
 	commands.spawn(
 		(
 			FpsText,
-			text.with_style(style),
+			Text::new(""),
+			TextFont {
+				font_size: 16.0,
+
+				..Default::default()
+			},
+			TextColor(Color::WHITE),
+			GlobalZIndex(i32::MAX),
+			Node {
+				position_type: PositionType::Absolute,
+				right: Val::Px(12.0),
+				top: Val::Px(8.0),
+				bottom: Val::Auto,
+				left: Val::Auto,
+
+				..Default::default()
+			},
 		),
 	);
 }
@@ -117,54 +111,61 @@ pub fn display(
 	}
 }
 
-pub fn update(diagnostics: Res<DiagnosticsStore>, mut fps_text: Query<&mut Text, With<FpsText>>) {
-	let mut text = fps_text.single_mut();
+pub fn update(
+	diagnostics: Res<DiagnosticsStore>,
+	mut fps_text: Query<
+		(
+			&mut Text,
+			&mut TextColor,
+		),
+		With<FpsText>,
+	>,
+) {
+	let (mut text, mut color) = fps_text.single_mut();
 
-	let (fps, color) = if let Some(value) = diagnostics
+	let value = match diagnostics
 		.get(&FrameTimeDiagnosticsPlugin::FPS)
 		.and_then(|fps| fps.smoothed())
 	{
-		let color = if value < 30.0 {
-			Color::srgb(
-				1.0,
-				0.0,
-				((value - 30.0) / (60.0 - 30.0)) as f32,
-			)
-		}
-		else if value < 60.0 {
-			Color::srgb(
-				1.0,
-				((value - 30.0) / (60.0 - 30.0)) as f32,
-				0.0,
-			)
-		}
-		else if value < 120.0 {
-			Color::srgb(
-				(1.0 - (value - 60.0) / (120.0 - 60.0)) as f32,
-				1.0,
-				0.0,
-			)
-		}
-		else {
-			Color::srgb(
-				1.0, 0.0, 0.0,
-			)
-		};
+		| Some(v) => v,
+		| None => 0.0,
+	};
 
-		(
-			format!("{value:>4.0}"),
-			color,
+
+	**text = if value > 0.0 {
+		format!("{value:>4.0}")
+	}
+	else {
+		String::from("N/A")
+	};
+
+	**color = if value > 120.0 {
+		Color::srgb(
+			1.0, 0.0, 0.0,
+		)
+	}
+	else if value > 60.0 {
+		Color::srgb(
+			(1.0 - (value - 60.0) / (120.0 - 60.0)) as f32,
+			1.0,
+			0.0,
+		)
+	}
+	else if value > 30.0 {
+		Color::srgb(
+			1.0,
+			((value - 30.0) / (60.0 - 30.0)) as f32,
+			0.0,
+		)
+	}
+	else if value > 0.0 {
+		Color::srgb(
+			1.0,
+			0.0,
+			((value - 30.0) / (60.0 - 30.0)) as f32,
 		)
 	}
 	else {
-		(
-			String::from("N/A"),
-			Color::WHITE,
-		)
+		Color::WHITE
 	};
-
-	text.sections[0].value = fps;
-	text.sections[0]
-		.style
-		.color = color;
 }

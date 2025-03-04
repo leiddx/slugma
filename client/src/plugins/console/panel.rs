@@ -1,11 +1,18 @@
 use bevy::{
 	color::Color,
+	ecs::{
+		component::Component,
+		event::{EventReader, EventWriter},
+		query::With,
+		system::{Query, Res, ResMut},
+	},
 	input::{
+		keyboard::KeyCode,
 		mouse::{MouseScrollUnit, MouseWheel},
 		ButtonInput,
 	},
-	prelude::{Component, EventReader, EventWriter, KeyCode, Query, Res, ResMut, TextBundle, With},
-	text::{Text, TextStyle},
+	text::{TextColor, TextFont},
+	ui::{widget::Text, Node},
 	window::WindowResized,
 };
 
@@ -19,14 +26,14 @@ pub struct Label;
 
 #[derive(Component, Default)]
 pub(crate) struct Panel {
-	pub style:       TextStyle,
+	pub style:       TextFont,
 	pub last_index:  Option<usize>,
 	pub scroll_step: usize,
 	pub max_display: usize,
 }
 
 impl Panel {
-	pub(crate) fn new(height: f32, style: TextStyle) -> Self {
+	pub(crate) fn new(height: f32, style: TextFont) -> Self {
 		let mut panel = Self {
 			style,
 
@@ -77,14 +84,23 @@ impl Panel {
 		}
 	}
 
-	pub fn from_section(&self) -> TextBundle {
-		let color = self.dyeing(&Level::Display);
-
-		TextBundle::from_section(
-			"",
-			TextStyle {
-				color,
+	pub fn from_section(
+		&self,
+		text: &str,
+	) -> (
+		Text,
+		TextFont,
+		TextColor,
+		Node,
+	) {
+		(
+			Text::new(text),
+			TextFont {
 				..self.style.clone()
+			},
+			TextColor::from(self.dyeing(&Level::Display)),
+			Node {
+				..Default::default()
 			},
 		)
 	}
@@ -188,7 +204,13 @@ pub fn resize(
 pub fn refresh(
 	actuator: Res<Actuator>,
 	mut panel: Query<&mut Panel>,
-	mut label: Query<&mut Text, With<Label>>,
+	mut label: Query<
+		(
+			&mut Text,
+			&mut TextColor,
+		),
+		With<Label>,
+	>,
 	mut panel_refresh: EventReader<PanelRefresh>,
 ) {
 	panel_refresh.clear();
@@ -241,12 +263,8 @@ pub fn refresh(
 			)
 		};
 
-		let color = panel.dyeing(&level);
-
-		v.sections[0].value = text;
-		v.sections[0]
-			.style
-			.color = color;
+		**v.0 = text;
+		**v.1 = panel.dyeing(&level);
 	}
 }
 

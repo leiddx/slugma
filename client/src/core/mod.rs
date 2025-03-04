@@ -10,10 +10,9 @@ use bevy::{
 	app::{App, AppExit, Update},
 	ecs::{
 		event::{Event, EventReader, EventWriter},
-		schedule::common_conditions,
+		schedule::{common_conditions, IntoSystemConfigs as _},
 		system::{Commands, ResMut},
 	},
-	prelude::IntoSystemConfigs,
 };
 use clap::ArgMatches;
 use event::{Execute, Feedback, Refresh};
@@ -86,8 +85,8 @@ impl bevy::app::Plugin for Plugin {
 		app.add_systems(
 			Update,
 			(
-				execute.run_if(common_conditions::on_event::<Execute>()),
-				feedback.run_if(common_conditions::on_event::<Feedback>()),
+				execute.run_if(common_conditions::on_event::<Execute>),
+				feedback.run_if(common_conditions::on_event::<Feedback>),
 			),
 		);
 	}

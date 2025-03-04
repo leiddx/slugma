@@ -1,16 +1,16 @@
 use bevy::{
 	asset::AssetServer,
-	color::Color,
-	input::ButtonInput,
-	prelude::{
-		BuildChildren, Commands, DespawnRecursiveExt, Entity, EventWriter, In, KeyCode, NextState,
-		NodeBundle, Query, Res, ResMut, TextBundle, With,
+	ecs::{
+		entity::Entity,
+		event::EventWriter,
+		query::With,
+		system::{Commands, In, Query, Res, ResMut},
 	},
-	text::TextStyle,
-	ui::{
-		AlignItems, BackgroundColor, Display, FlexDirection, JustifyContent, Overflow, Style,
-		UiRect, Val,
-	},
+	hierarchy::{BuildChildren as _, DespawnRecursiveExt as _},
+	input::{keyboard::KeyCode, ButtonInput},
+	state::state::NextState,
+	text::TextFont,
+	ui::{AlignItems, Display, FlexDirection, JustifyContent, Node, Overflow, UiRect, Val},
 	window::Window,
 };
 
@@ -30,28 +30,27 @@ pub fn setup(
 ) {
 	let window = window.single_mut();
 
-	let text_style = TextStyle {
-		font: asset_server.load("fonts/SourceHanSansCN-Regular.otf"),
-		font_size: 16.0,
-
-		..Default::default()
-	};
-
 
 	let panel = Panel::new(
 		window.height(),
-		text_style.clone(),
+		TextFont {
+			font: asset_server.load("fonts/SourceHanSansCN-Regular.otf"),
+			font_size: 16.0,
+
+			..Default::default()
+		},
 	);
+
+	let input = panel.from_section("$ _");
+
 
 	let mut label: Vec<Entity> = Vec::new();
 
 	for _ in 0..panel.max_display {
-		let mut label_text = panel.from_section();
+		let mut label_text = panel.from_section("");
 
-		label_text
-			.style
-			.min_height = Val::Px(10.0);
-		label_text.style.margin = UiRect::left(Val::Px(10.0));
+		label_text.1.font_size = 10.0;
+		label_text.3.margin = UiRect::left(Val::Px(10.0));
 
 		let id = commands
 			.spawn(
@@ -68,26 +67,20 @@ pub fn setup(
 		.spawn(
 			(
 				panel,
-				NodeBundle {
-					style: Style {
-						display: Display::Flex,
-						flex_direction: FlexDirection::Column,
-						justify_content: JustifyContent::FlexEnd,
-						width: Val::Vw(100.0),
-						height: Val::Vh(100.0),
-						padding: UiRect::all(Val::Px(10.0)),
-						overflow: Overflow::clip(),
+				Node {
+					display: Display::Flex,
+					flex_direction: FlexDirection::Column,
+					justify_content: JustifyContent::FlexEnd,
+					width: Val::Vw(100.0),
+					height: Val::Vh(100.0),
+					padding: UiRect::all(Val::Px(10.0)),
+					overflow: Overflow::clip(),
 
-						..Default::default()
-					},
-
-					background_color: BackgroundColor(
-						Color::srgba(
-							0.0, 0.0, 0.0, 0.75,
-						),
-					),
-
-					..Default::default()
+					..Default::default() // background_color: BackgroundColor(
+					                     // 	Color::srgba(
+					                     // 		0.0, 0.0, 0.0, 0.75,
+					                     // 	),
+					                     // ),
 				},
 			),
 		)
@@ -95,8 +88,10 @@ pub fn setup(
 
 	let prompt = commands
 		.spawn(
-			NodeBundle {
-				style: Style {
+			(
+				Prompt,
+				input,
+				Node {
 					display: Display::Flex,
 					align_items: AlignItems::Center,
 					width: Val::Percent(100.0),
@@ -104,22 +99,7 @@ pub fn setup(
 
 					..Default::default()
 				},
-
-				..Default::default()
-			},
-		)
-		.with_children(
-			|parent| {
-				parent.spawn(
-					(
-						Prompt,
-						TextBundle::from_section(
-							"$ _",
-							text_style.clone(),
-						),
-					),
-				);
-			},
+			),
 		)
 		.id();
 

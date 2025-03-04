@@ -2,15 +2,17 @@ use bevy::{
 	app::{App, Startup, Update},
 	ecs::{
 		event::EventReader,
-		schedule::common_conditions,
-		system::{Query, ResMut},
+		schedule::{common_conditions, IntoSystemConfigs as _},
+		system::{Query, ResMut, Single},
 	},
 	input::{
 		keyboard::{KeyCode, KeyboardInput},
 		ButtonInput,
 	},
-	prelude::IntoSystemConfigs,
-	window::{CursorGrabMode, EnabledButtons, Window, WindowFocused, WindowLevel, WindowMode},
+	window::{
+		CursorGrabMode, EnabledButtons, MonitorSelection, Window, WindowFocused, WindowLevel,
+		WindowMode,
+	},
 };
 
 pub fn setup(mut window: Query<&mut Window>) {
@@ -27,7 +29,8 @@ pub fn setup(mut window: Query<&mut Window>) {
 		w.focused = true;
 		w.resizable = false;
 		w.mode = WindowMode::Windowed;
-		w.cursor.grab_mode = GRAB_MODE;
+		w.cursor_options
+			.grab_mode = GRAB_MODE;
 
 		w.enabled_buttons = EnabledButtons {
 			minimize: true,
@@ -41,13 +44,13 @@ pub fn focus(mut window: Query<&mut Window>, mut window_focused: EventReader<Win
 	for v in window_focused.read() {
 		if let Ok(mut w) = window.get_mut(v.window) {
 			if v.focused {
-				if w.mode == WindowMode::Fullscreen {
+				if w.mode == WindowMode::Fullscreen(MonitorSelection::Current) {
 					w.set_minimized(false);
 					w.set_maximized(true);
 				}
 			}
 			else {
-				if w.mode == WindowMode::Fullscreen {
+				if w.mode == WindowMode::Fullscreen(MonitorSelection::Current) {
 					w.set_minimized(true);
 					w.set_maximized(false);
 				}
@@ -56,22 +59,22 @@ pub fn focus(mut window: Query<&mut Window>, mut window_focused: EventReader<Win
 	}
 }
 
-pub fn change_mode(mut key_code: ResMut<ButtonInput<KeyCode>>, mut window: Query<&mut Window>) {
-	let mut window = window.single_mut();
-
+pub fn change_mode(mut key_code: ResMut<ButtonInput<KeyCode>>, mut window: Single<&mut Window>) {
 	let alt = key_code.any_pressed([KeyCode::AltLeft, KeyCode::AltRight]);
 	let enter = key_code.any_just_pressed([KeyCode::Enter, KeyCode::NumpadEnter]);
 
 	if alt && enter {
 		window.mode = match window.mode {
-			| WindowMode::Windowed => WindowMode::Fullscreen,
-			| WindowMode::Fullscreen => WindowMode::Windowed,
+			| WindowMode::Windowed => WindowMode::Fullscreen(MonitorSelection::Current),
+			| WindowMode::Fullscreen(MonitorSelection::Current) => WindowMode::Windowed,
 			| _ => window.mode,
 		};
 
 		window.window_level = match window.mode {
-			| WindowMode::BorderlessFullscreen => WindowLevel::AlwaysOnBottom,
-			| WindowMode::Fullscreen => WindowLevel::AlwaysOnTop,
+			| WindowMode::BorderlessFullscreen(MonitorSelection::Current) => {
+				WindowLevel::AlwaysOnBottom
+			},
+			| WindowMode::Fullscreen(MonitorSelection::Current) => WindowLevel::AlwaysOnTop,
 			| _ => window.window_level,
 		};
 
@@ -93,8 +96,8 @@ impl bevy::app::Plugin for Plugin {
 		app.add_systems(
 			Update,
 			(
-				focus.run_if(common_conditions::on_event::<WindowFocused>()),
-				change_mode.run_if(common_conditions::on_event::<KeyboardInput>()),
+				focus.run_if(common_conditions::on_event::<WindowFocused>),
+				change_mode.run_if(common_conditions::on_event::<KeyboardInput>),
 			),
 		);
 	}

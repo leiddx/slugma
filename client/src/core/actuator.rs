@@ -1,6 +1,6 @@
 use std::collections::{vec_deque::Iter, HashMap};
 
-use bevy::{ecs::system::SystemId, prelude::Resource};
+use bevy::ecs::system::{Resource, SystemId};
 use clap::ArgMatches;
 use shlex::Shlex;
 

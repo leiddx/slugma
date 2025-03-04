@@ -5,7 +5,7 @@ pub mod ui;
 use bevy::{
 	app::{App, Update},
 	diagnostic::FrameTimeDiagnosticsPlugin,
-	ecs::schedule::{common_conditions, IntoSystemConfigs},
+	ecs::schedule::{common_conditions, IntoSystemConfigs as _},
 	state::{
 		app::AppExtStates,
 		condition,
@@ -44,7 +44,7 @@ impl bevy::app::Plugin for Plugin {
 		app.add_systems(
 			Update,
 			(
-				ui::display.run_if(common_conditions::on_event::<event::Fps>()),
+				ui::display.run_if(common_conditions::on_event::<event::Fps>),
 				ui::update.run_if(condition::in_state(state::Fps::On)),
 			),
 		);

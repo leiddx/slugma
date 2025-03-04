@@ -1,4 +1,4 @@
-use bevy::{ecs::system::SystemId, prelude::Resource};
+use bevy::ecs::system::{Resource, SystemId};
 use clap::ArgMatches;
 
 #[derive(Resource, Debug)]

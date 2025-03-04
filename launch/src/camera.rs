@@ -1,6 +1,6 @@
 use bevy::{
 	app::{App, Startup},
-	core_pipeline::core_3d::Camera3dBundle,
+	core_pipeline::core_3d::Camera3d,
 	ecs::{
 		component::Component,
 		entity::Entity,
@@ -20,17 +20,14 @@ pub fn setup(mut commands: Commands) {
 	commands.spawn(
 		(
 			Mark,
-			Camera3dBundle {
-				transform: Transform::from_xyz(
-					2.5, 5.0, 10.0,
-				)
-				.looking_at(
-					Vec3::ZERO,
-					Vec3::Y,
-				),
-
-				..Default::default()
-			},
+			Camera3d::default(),
+			Transform::from_xyz(
+				2.5, 5.0, 10.0,
+			)
+			.looking_at(
+				Vec3::ZERO,
+				Vec3::Y,
+			),
 		),
 	);
 }
@@ -47,7 +44,7 @@ pub fn cleanup(mut commands: Commands, mark: Query<Entity, With<Mark>>) {
 pub fn rotate(time: Res<Time>, mut query: Query<&mut Transform, With<Mark>>) {
 	let mut transform = query.single_mut();
 
-	let rotation = Quat::from_rotation_y(time.delta_seconds() / 2.0);
+	let rotation = Quat::from_rotation_y(time.delta_secs() / 2.0);
 
 
 	transform.rotate_around(
